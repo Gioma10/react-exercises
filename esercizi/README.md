@@ -51,4 +51,5 @@ Il modello dei dati è in `apps/api/src/data.ts`. Leggilo, ma **non importarlo**
 
 | # | Titolo | Stato |
 |---|---|---|
+| 00 | [Drill fetch](00-drill-fetch.md) | ⬜ |
 | 01 | [Lista articoli (Server Component)](01-lista-articoli.md) | ⬜ |
