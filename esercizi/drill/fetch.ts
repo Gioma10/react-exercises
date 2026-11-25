@@ -56,13 +56,21 @@ const fetchBiggestArticle = async () => {
 // fetchBiggestArticle();
 
 // 04
+class HttpError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
 export const getArticle = async (id: string): Promise<Article> => {
   const res = await fetch(`${BASEURL}/articles/${id}`);
 
   if (!res.ok) {
     const body = await res.json();
 
-    throw new Error(body.error.message);
+    throw new HttpError(res.status, body.error.message);
   }
 
   const article: Article = await res.json();
@@ -72,9 +80,13 @@ export const getArticle = async (id: string): Promise<Article> => {
 
 try {
   //  await getArticle("10");
-  //    await getArticle("9999");
+  // await getArticle("9999");
 } catch (error) {
-  console.log(error);
+  if (error instanceof HttpError) {
+    console.log("Errore Http", error.status);
+  } else {
+    console.log("Server non raggiungibile");
+  }
 }
 
 // 05
@@ -199,4 +211,38 @@ const fetchInvalidComment = async (
   console.log(commentedArticle);
 };
 
-fetchInvalidComment("Gioma", "1", "");
+// fetchInvalidComment("Gioma", "1", "");
+
+// 10
+const fetchArticlesV2 = async (id: string) => {
+  const res = await fetch(`${BASEURL}/articles/${id}`);
+
+  if (!res.ok) {
+    const body= await res.json();
+    throw new HttpError(res.status, body.error.message);
+  }
+  const article: Promise<Article> = res.json();
+
+  return article;
+};
+
+const fetchFirstThreeArticles = async () => {
+  try {
+    const articles = await Promise.all([
+      fetchArticlesV2(`1`),
+      fetchArticlesV2(`2`),
+      fetchArticlesV2(`3`),
+    ]);
+    for (const article of articles) {
+      console.log(article.title);
+    }
+  } catch (error) {
+    if (error instanceof HttpError) {
+      console.log("Errore Http", error.status);
+    } else {
+      console.log("Server non raggiungibile");
+    }
+  }
+};
+
+fetchFirstThreeArticles();
